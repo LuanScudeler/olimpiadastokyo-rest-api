@@ -4,17 +4,15 @@ import olimpiadastokyo.entities.Competicao;
 import olimpiadastokyo.repositories.CompeticaoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.Date;
 
 @SpringBootApplication
-public class OlimpiadasTokyoApplication {
+public class OlimpiadasTokyoApplication implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(OlimpiadasTokyoApplication.class);
 
@@ -22,28 +20,29 @@ public class OlimpiadasTokyoApplication {
         SpringApplication.run(OlimpiadasTokyoApplication.class);
     }
 
-    @Bean
-    public CommandLineRunner demo(CompeticaoRepository repository) {
-        return (args) -> {
-            repository.save(new Competicao("Boxe", "Tokyo", "Brasil", "Japão", "Semifinal", LocalDateTime.now(), LocalDateTime.of(LocalDate.now(), LocalTime.now().plusHours(2L))));
-            repository.save(new Competicao("Boxe", "Tokyo", "USA", "Argentina", "Final", LocalDateTime.now(), LocalDateTime.of(LocalDate.now(), LocalTime.now().plusHours(2L))));
-            repository.save(new Competicao("Futebol", "Tokyo", "Itália", "China", "Oitavas de Final", LocalDateTime.now(), LocalDateTime.of(LocalDate.now(), LocalTime.now().plusHours(2L))));
-            repository.save(new Competicao("Basquete", "Tokyo", "Inglaterra", "México", "Quartas de Final", LocalDateTime.now(), LocalDateTime.of(LocalDate.now(), LocalTime.now().plusHours(2L))));
+    @Autowired
+    CompeticaoRepository repository;
 
-            log.info("Competicao -> findAll():");
-            log.info("-------------------------------");
-            for (Competicao competicao : repository.findAll()) {
-                log.info(competicao.toString());
-            }
-            log.info("-------------------------------");
+    @Override
+    public void run(String... args) throws Exception {
+        repository.save(new Competicao(null, "Boxe", "Tokyo", "Brasil", "Japão", "Semifinal", new Date().toString(), new Date().toString()));
+        repository.save(new Competicao(null, "Boxe", "Tokyo", "USA", "Argentina", "Final", new Date().toString(), new Date().toString()));
+        repository.save(new Competicao(null, "Futebol", "Tokyo", "Itália", "China", "Oitavas de Final", new Date().toString(), new Date().toString()));
+        repository.save(new Competicao(null, "Basquete", "Tokyo", "Inglaterra", "México", "Quartas de Final", new Date().toString(), new Date().toString()));
 
-            log.info("Competicao -> findByModalidade():");
-            log.info("-------------------------------");
-            for (Competicao competicao : repository.findByModalidade("Boxe")) {
-                log.info(competicao.toString());
-            }
-            log.info("-------------------------------");
-        };
+        log.info("Competicao -> findAll():");
+        log.info("-------------------------------");
+        for (Competicao competicao : repository.findAll()) {
+            log.info(competicao.toString());
+        }
+        log.info("-------------------------------");
+
+        log.info("Competicao -> findByModalidade():");
+        log.info("-------------------------------");
+        for (Competicao competicao : repository.findByModalidade("Boxe")) {
+            log.info(competicao.toString());
+        }
+        log.info("-------------------------------");
+
     }
-
 }
