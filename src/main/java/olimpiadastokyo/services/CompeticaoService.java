@@ -2,6 +2,7 @@ package olimpiadastokyo.services;
 
 import olimpiadastokyo.entities.Competicao;
 import olimpiadastokyo.exceptions.EntityNotFoundException;
+import olimpiadastokyo.exceptions.RuleBrokenException;
 import olimpiadastokyo.repositories.CompeticaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,8 +35,12 @@ public class CompeticaoService {
         }
     }
 
-    public void create(Competicao competicao) {
-        competicaoRepository.save(competicao);
-    }
+    public void create(Competicao competicao) throws RuleBrokenException {
+        List<Competicao> list = competicaoRepository.find(competicao.getModalidade(), competicao.getLocal(), competicao.getInicio());
 
+        if(list.size() <= 0)
+            competicaoRepository.save(competicao);
+        else
+            throw new RuleBrokenException(Competicao.class, 0);
+    }
 }

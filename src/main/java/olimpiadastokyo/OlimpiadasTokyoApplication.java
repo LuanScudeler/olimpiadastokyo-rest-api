@@ -25,10 +25,10 @@ public class OlimpiadasTokyoApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        repository.save(new Competicao(null, "Boxe", "Tokyo", "Brasil", "Japão", "Semifinal", new Date().toString(), new Date().toString()));
-        repository.save(new Competicao(null, "Boxe", "Tokyo", "USA", "Argentina", "Final", new Date().toString(), new Date().toString()));
-        repository.save(new Competicao(null, "Futebol", "Tokyo", "Itália", "China", "Oitavas de Final", new Date().toString(), new Date().toString()));
-        repository.save(new Competicao(null, "Basquete", "Tokyo", "Inglaterra", "México", "Quartas de Final", new Date().toString(), new Date().toString()));
+        repository.save(new Competicao(null, "Boxe", "Tokyo", "Brasil", "Japão", "Semifinal", new Date(), new Date()));
+        repository.save(new Competicao(null, "Boxe", "Tokyo", "USA", "Argentina", "Final", new Date(), new Date()));
+        repository.save(new Competicao(null, "Futebol", "Tokyo", "Itália", "China", "Oitavas de Final", new Date(), new Date()));
+        repository.save(new Competicao(null, "Basquete", "Tokyo", "Inglaterra", "México", "Quartas de Final", new Date(), new Date()));
 
         log.info("Competicao -> findAll():");
         log.info("-------------------------------");
