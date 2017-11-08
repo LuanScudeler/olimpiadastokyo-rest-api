@@ -17,7 +17,7 @@ import java.util.List;
 public class CompeticaoService {
 
     @Autowired
-    CompeticaoRepository competicaoRepository;
+    private CompeticaoRepository competicaoRepository;
 
     public List<Competicao> getCompeticoes(String modalidade) throws EntityNotFoundException {
         List<Competicao> list = new ArrayList<Competicao>();

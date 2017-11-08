@@ -17,7 +17,7 @@ public class CompeticaoController {
     private static final Logger log = LoggerFactory.getLogger(CompeticaoController.class);
 
     @Autowired
-    CompeticaoService competicaoService;
+    private CompeticaoService competicaoService;
 
     @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json")
     public List<Competicao> getCompeticoes(@RequestParam(value="modalidade", defaultValue = "") String modalidade) throws EntityNotFoundException {
