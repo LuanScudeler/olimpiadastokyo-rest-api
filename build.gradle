@@ -1,0 +1,44 @@
+group 'java.desafio.handson'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir = file("$buildDir/classes/main/")
+    }
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.3.RELEASE'
+        classpath 'org.springframework:springloaded:1.2.6.RELEASE'
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+jar {
+    baseName = 'olimpiadastokyo-rest-api'
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.springframework:springloaded:1.2.6.RELEASE")
+    compile group: 'org.hsqldb', name: 'hsqldb', version: '2.0.0'
+
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("junit:junit")
+}
