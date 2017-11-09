@@ -2,6 +2,7 @@ package olimpiadastokyo.controllers;
 
 import olimpiadastokyo.entities.Competicao;
 import olimpiadastokyo.exceptions.EntityNotFoundException;
+import olimpiadastokyo.exceptions.RuleBrokenException;
 import olimpiadastokyo.services.CompeticaoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class CompeticaoController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
-    public void create(@RequestBody Competicao competicao) {
+    public void create(@RequestBody Competicao competicao) throws RuleBrokenException {
         competicaoService.create(competicao);
     }
 }

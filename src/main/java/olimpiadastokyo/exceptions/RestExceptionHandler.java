@@ -28,6 +28,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(RuleBrokenException.class)
+    protected ResponseEntity<Object> handleRuleBroken(EntityNotFoundException ex) {
+        RestApiError apiError = new RestApiError(HttpStatus.FORBIDDEN);
+        apiError.setMessage(ex.getMessage());
+        return buildResponseEntity(apiError);
+    }
+
     private ResponseEntity<Object> buildResponseEntity(RestApiError apiError) {
         return new ResponseEntity<Object>(apiError, apiError.getStatus());
     }
