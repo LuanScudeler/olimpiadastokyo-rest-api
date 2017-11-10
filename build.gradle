@@ -40,6 +40,7 @@ dependencies {
     compile group: 'org.hsqldb', name: 'hsqldb', version: '2.0.0'
     compile ("org.projectlombok:lombok:1.16.16")
     compile group: 'joda-time', name: 'joda-time', version: '2.3'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-joda', version: '2.0.2'
 
 
     testCompile("org.springframework.boot:spring-boot-starter-test")

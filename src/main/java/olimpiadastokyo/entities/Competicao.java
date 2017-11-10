@@ -5,13 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.Date;
 
 @Entity
 @Data
@@ -26,11 +24,19 @@ public class Competicao implements Comparable<Competicao> {
     private String adversarioUm;
     private String adversarioDois;
     private String etapa;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private DateTime inicio;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private DateTime termino;
+    private Integer date;
 
+    @JsonFormat(pattern = "dd-MM-yyyy hh:mm:ss")
+    public DateTime getInicio() {
+        return inicio;
+    }
+
+    @JsonFormat(pattern = "dd-MM-yyyy hh:mm:ss")
+    public DateTime getTermino() {
+        return termino;
+    }
 
     @Override
     public int compareTo(Competicao o) {

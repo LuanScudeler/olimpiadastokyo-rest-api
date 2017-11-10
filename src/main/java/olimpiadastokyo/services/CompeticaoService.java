@@ -2,15 +2,13 @@ package olimpiadastokyo.services;
 
 import olimpiadastokyo.entities.Competicao;
 import olimpiadastokyo.exceptions.EntityNotFoundException;
-import olimpiadastokyo.exceptions.RuleErrorMessagesEnum;
 import olimpiadastokyo.exceptions.RuleBrokenException;
+import olimpiadastokyo.exceptions.RuleErrorMessagesEnum;
 import olimpiadastokyo.repositories.CompeticaoRepository;
-import org.joda.time.Instant;
 import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,7 +23,7 @@ public class CompeticaoService {
     private CompeticaoRepository competicaoRepository;
 
     public List<Competicao> getCompeticoes(String modalidade) throws EntityNotFoundException {
-        List<Competicao> list = new ArrayList<Competicao>();
+        List<Competicao> list;
 
         if(modalidade.isEmpty())
             list = competicaoRepository.findAll();
@@ -41,19 +39,32 @@ public class CompeticaoService {
     }
 
     public void create(Competicao competicao) throws RuleBrokenException {
-        List<Competicao> list = competicaoRepository.find(competicao.getModalidade(), competicao.getLocal(), competicao.getInicio());
 
-        System.out.println(String.format("Interval in minutes: %d",new Interval(competicao.getInicio(), competicao.getTermino()).toDuration().getStandardMinutes()));
-
-        if(list.size() > 0)
+        if(!checkForTimeOverlap(competicao))
             throw new RuleBrokenException(Competicao.class, RuleErrorMessagesEnum.COD_0);
-        else if (false)
+        else if (!checkForMatchDuration(competicao))
             throw new RuleBrokenException(Competicao.class, RuleErrorMessagesEnum.COD_1);
         else
             competicaoRepository.save(competicao);
+    }
 
+    private boolean checkForMatchDuration(Competicao competicao) {
+        long duration = new Interval(competicao.getInicio(), competicao.getTermino()).toDuration().getStandardMinutes();
+        if (duration < 30)
+            return false;
 
+        return true;
+    }
 
-
+    public boolean checkForTimeOverlap(Competicao competicao) {
+        List<Competicao> list = competicaoRepository.find(competicao.getModalidade(), competicao.getLocal(), competicao.getInicio());
+        for (Competicao c : list) {
+            if(c.getTermino().getYear() == competicao.getTermino().getYear() &&
+                    c.getTermino().getMonthOfYear() == competicao.getTermino().getMonthOfYear() &&
+                    c.getTermino().getDayOfMonth() == competicao.getTermino().getDayOfMonth()) {
+                return false;
+            }
+        }
+        return true;
     }
 }
