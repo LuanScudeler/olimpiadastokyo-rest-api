@@ -1,46 +1,58 @@
 package olimpiadastokyo.entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Competicao implements Comparable<Competicao> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long competicaoId;
+    @NotNull
     private String modalidade;
+    @NotNull
     private String local;
+    @NotNull
     private String adversarioUm;
+    @NotNull
     private String adversarioDois;
+    @NotNull
     private String etapa;
-    private DateTime inicio;
-    private DateTime termino;
-    private LocalDate date;
-
-    @JsonFormat(pattern = "dd-MM-yyyy hh:mm:ss")
-    public DateTime getInicio() {
-        return inicio;
-    }
-
-    @JsonFormat(pattern = "dd-MM-yyyy hh:mm:ss")
-    public DateTime getTermino() {
-        return termino;
-    }
+    @NotNull
+    private LocalDate dataInicio;
+    @NotNull
+    private LocalDate dataTermino;
+    @NotNull
+    private LocalTime horaInicio;
+    @NotNull
+    private LocalTime horaTermino;
 
     @Override
     public int compareTo(Competicao o) {
-        return getInicio().compareTo(o.getInicio());
+        int firstCompare = getDataInicio().compareTo(o.getDataInicio());
+        if (firstCompare == 0) {
+            int secondCompare = getDataTermino().compareTo(o.getDataTermino());
+
+            if (secondCompare == 0) {
+                return getHoraInicio().compareTo(o.getHoraInicio());
+            } else {
+                return secondCompare;
+            }
+        }
+        return firstCompare;
     }
 }

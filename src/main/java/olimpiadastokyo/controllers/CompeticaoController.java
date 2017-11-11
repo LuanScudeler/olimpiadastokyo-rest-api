@@ -7,8 +7,10 @@ import olimpiadastokyo.services.CompeticaoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -20,13 +22,21 @@ public class CompeticaoController {
     @Autowired
     private CompeticaoService competicaoService;
 
+    @Autowired
+    private CompeticaoValidator competicaoValidator;
+
+    @InitBinder("competicao")
+    public void setupBinder(WebDataBinder binder) {
+        binder.addValidators(competicaoValidator);
+    }
+
     @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json")
     public List<Competicao> getCompeticoes(@RequestParam(value="modalidade", defaultValue = "") String modalidade) throws EntityNotFoundException {
         return competicaoService.getCompeticoes(modalidade);
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
-    public void create(@RequestBody Competicao competicao) throws RuleBrokenException {
+    public void create(@Valid @RequestBody Competicao competicao) throws RuleBrokenException {
         competicaoService.create(competicao);
     }
 }

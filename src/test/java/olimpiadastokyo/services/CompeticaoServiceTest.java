@@ -2,7 +2,8 @@ package olimpiadastokyo.services;
 
 import olimpiadastokyo.entities.Competicao;
 import olimpiadastokyo.repositories.CompeticaoRepository;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,23 +42,36 @@ public class CompeticaoServiceTest {
 
     @Before
     public void setUp() {
-        Competicao competicao = new Competicao(null, "Boxe", "Tokyo", "Brasil", "Japão", "Semifinal", new DateTime(), new DateTime().plusHours(1), null);
+        Competicao competicao = Competicao.builder().modalidade("Boxe").local("Tokyo").
+                adversarioUm("Brasil").adversarioDois("Japão").etapa("Semifinal").
+                dataInicio(new LocalDate()).dataTermino(new LocalDate()).
+                horaInicio(new LocalTime()).horaTermino(new LocalTime().plusHours(1)).build();
         List<Competicao> list = new ArrayList<>();
         list.add(competicao);
 
-        Mockito.when(competicaoRepository.findTimeOverlap(competicao.getModalidade(), competicao.getLocal(), competicao.getInicio()))
-                .thenReturn(list);
+        Mockito.when(competicaoRepository.findTimeOverlap(competicao.getModalidade(), competicao.getLocal(),
+                competicao.getDataInicio(), competicao.getDataTermino(),
+                competicao.getHoraInicio(), competicao.getHoraTermino())).
+                thenReturn(list);
     }
 
     @Test
     public void checkForMinMatchDuration_checkShouldFail() {
-        Competicao comp = new Competicao(null, "Boxe", "Tokyo", "Brasil", "Japão", "Semifinal", new DateTime(), new DateTime().plusMinutes(20), null);
+        Competicao comp = Competicao.builder().modalidade("Boxe").local("Tokyo").
+                adversarioUm("Brasil").adversarioDois("Japão").etapa("Semifinal").
+                dataInicio(new LocalDate()).dataTermino(new LocalDate()).
+                horaInicio(new LocalTime()).horaTermino(new LocalTime().plusMinutes(20)).build();
+
         Assert.assertFalse(competicaoService.checkForMinMatchDuration(comp));
     }
 
     @Test
     public void checkForTimeOverlap_checkShouldFail() {
-        Competicao competicao = new Competicao(null, "Boxe", "Tokyo", "Brasil", "Japão", "Semifinal", new DateTime(), new DateTime().plusHours(1), null);
+        Competicao competicao = Competicao.builder().modalidade("Boxe").local("Tokyo").
+                adversarioUm("Brasil").adversarioDois("Japão").etapa("Semifinal").
+                dataInicio(new LocalDate()).dataTermino(new LocalDate()).
+                horaInicio(new LocalTime()).horaTermino(new LocalTime().plusHours(1)).build();
+
         Assert.assertFalse(competicaoService.checkForTimeOverlap(competicao));
     }
 }

@@ -2,8 +2,8 @@ package olimpiadastokyo;
 
 import olimpiadastokyo.entities.Competicao;
 import olimpiadastokyo.repositories.CompeticaoRepository;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +25,21 @@ public class OlimpiadasTokyoApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        repository.save(new Competicao(null, "Boxe", "Tokyo", "Brasil", "Japão", "Semifinal", new DateTime(), new DateTime(), new LocalDate()));
-        repository.save(new Competicao(null, "Boxe", "Tokyo", "USA", "Argentina", "Final", new DateTime(), new DateTime(),  new LocalDate()));
-        repository.save(new Competicao(null, "Futebol", "Tokyo", "Itália", "China", "Oitavas de Final", new DateTime(), new DateTime(),  new LocalDate()));
-        repository.save(new Competicao(null, "Basquete", "Tokyo", "Inglaterra", "México", "Quartas de Final", new DateTime(), new DateTime(),  new LocalDate()));
+        repository.save(Competicao.builder().modalidade("Boxe").local("Tokyo").adversarioUm("Brasil").adversarioDois("Japão").etapa("Semifinal").
+                dataInicio(new LocalDate()).dataTermino(new LocalDate()).
+                horaInicio(new LocalTime()).horaTermino(new LocalTime().plusHours(1)).build());
+
+        repository.save(Competicao.builder().modalidade("Boxe").local("Tokyo").adversarioUm("USA").adversarioDois("Argentina").etapa("Final").
+                dataInicio(new LocalDate()).dataTermino(new LocalDate()).
+                horaInicio(new LocalTime()).horaTermino(new LocalTime().plusHours(1)).build());
+
+        repository.save(Competicao.builder().modalidade("Boxe").local("Tokyo").adversarioUm("Itália").adversarioDois("China").etapa("Oitavas de Final").
+                dataInicio(new LocalDate()).dataTermino(new LocalDate()).
+                horaInicio(new LocalTime().plusHours(7)).horaTermino(new LocalTime().plusHours(9)).build());
+
+        repository.save(Competicao.builder().modalidade("Boxe").local("Tokyo").adversarioUm("Inglaterra").adversarioDois("México").etapa("Quartas de Final").
+                dataInicio(new LocalDate()).dataTermino(new LocalDate()).
+                horaInicio(new LocalTime().minusHours(2)).horaTermino(new LocalTime().minusHours(1)).build());
 
         log.info("Competicao -> findAll():");
         log.info("-------------------------------");
@@ -42,6 +53,20 @@ public class OlimpiadasTokyoApplication implements CommandLineRunner {
         for (Competicao competicao : repository.findByModalidade("Boxe")) {
             log.info(competicao.toString());
         }
+        log.info("-------------------------------");
+
+        log.info("Competicao -> findTimeOverlap():");
+        log.info("-------------------------------");
+
+        LocalTime inicio = new LocalTime().plusHours(8);
+        LocalTime termino = new LocalTime().plusHours(10);
+
+        for (Competicao competicao : repository.findTimeOverlap("Boxe", "Tokyo",
+                new LocalDate().plusDays(1), new LocalDate().plusDays(1),
+                new LocalTime().plusHours(8), new LocalTime().plusHours(10))) {
+            log.info(competicao.toString());
+        }
+        log.info("-> " + inicio + " - " + termino  + new LocalDate().plusDays(1) + new LocalDate().plusDays(1));
         log.info("-------------------------------");
 
     }
