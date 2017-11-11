@@ -3,6 +3,7 @@ package olimpiadastokyo;
 import olimpiadastokyo.entities.Competicao;
 import olimpiadastokyo.repositories.CompeticaoRepository;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,10 @@ public class OlimpiadasTokyoApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        repository.save(new Competicao(null, "Boxe", "Tokyo", "Brasil", "Japão", "Semifinal", new DateTime(), new DateTime(), null));
-        repository.save(new Competicao(null, "Boxe", "Tokyo", "USA", "Argentina", "Final", new DateTime(), new DateTime(), null));
-        repository.save(new Competicao(null, "Futebol", "Tokyo", "Itália", "China", "Oitavas de Final", new DateTime(), new DateTime(), null));
-        repository.save(new Competicao(null, "Basquete", "Tokyo", "Inglaterra", "México", "Quartas de Final", new DateTime(), new DateTime(), null));
+        repository.save(new Competicao(null, "Boxe", "Tokyo", "Brasil", "Japão", "Semifinal", new DateTime(), new DateTime(), new LocalDate()));
+        repository.save(new Competicao(null, "Boxe", "Tokyo", "USA", "Argentina", "Final", new DateTime(), new DateTime(),  new LocalDate()));
+        repository.save(new Competicao(null, "Futebol", "Tokyo", "Itália", "China", "Oitavas de Final", new DateTime(), new DateTime(),  new LocalDate()));
+        repository.save(new Competicao(null, "Basquete", "Tokyo", "Inglaterra", "México", "Quartas de Final", new DateTime(), new DateTime(),  new LocalDate()));
 
         log.info("Competicao -> findAll():");
         log.info("-------------------------------");

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,7 +27,7 @@ public class Competicao implements Comparable<Competicao> {
     private String etapa;
     private DateTime inicio;
     private DateTime termino;
-    private Integer date;
+    private LocalDate date;
 
     @JsonFormat(pattern = "dd-MM-yyyy hh:mm:ss")
     public DateTime getInicio() {

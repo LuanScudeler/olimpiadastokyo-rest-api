@@ -39,16 +39,26 @@ public class CompeticaoService {
     }
 
     public void create(Competicao competicao) throws RuleBrokenException {
-
+        competicao.setDate(competicao.getInicio().toLocalDate());
         if(!checkForTimeOverlap(competicao))
             throw new RuleBrokenException(Competicao.class, RuleErrorMessagesEnum.COD_0);
-        else if (!checkForMatchDuration(competicao))
+        else if (!checkForMinMatchDuration(competicao))
             throw new RuleBrokenException(Competicao.class, RuleErrorMessagesEnum.COD_1);
-        else
+        else if (!checkForMaxMatchesPerDay(competicao)) {
+            throw new RuleBrokenException(Competicao.class, RuleErrorMessagesEnum.COD_2);
+        } else
             competicaoRepository.save(competicao);
     }
 
-    private boolean checkForMatchDuration(Competicao competicao) {
+    private boolean checkForMaxMatchesPerDay(Competicao competicao) {
+        List<Competicao> list = competicaoRepository.findMatchesByDate(competicao.getDate());
+        if (list.size() >= 4)
+            return false;
+
+        return true;
+    }
+
+    public boolean checkForMinMatchDuration(Competicao competicao) {
         long duration = new Interval(competicao.getInicio(), competicao.getTermino()).toDuration().getStandardMinutes();
         if (duration < 30)
             return false;
@@ -57,11 +67,9 @@ public class CompeticaoService {
     }
 
     public boolean checkForTimeOverlap(Competicao competicao) {
-        List<Competicao> list = competicaoRepository.find(competicao.getModalidade(), competicao.getLocal(), competicao.getInicio());
+        List<Competicao> list = competicaoRepository.findTimeOverlap(competicao.getModalidade(), competicao.getLocal(), competicao.getInicio());
         for (Competicao c : list) {
-            if(c.getTermino().getYear() == competicao.getTermino().getYear() &&
-                    c.getTermino().getMonthOfYear() == competicao.getTermino().getMonthOfYear() &&
-                    c.getTermino().getDayOfMonth() == competicao.getTermino().getDayOfMonth()) {
+            if(c.getDate().equals(competicao.getDate())) {
                 return false;
             }
         }
