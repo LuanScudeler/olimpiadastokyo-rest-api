@@ -2,7 +2,6 @@ package olimpiadastokyo.repositories;
 
 import olimpiadastokyo.entities.Competicao;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,19 +13,19 @@ import java.util.List;
 public interface CompeticaoRepository extends JpaRepository<Competicao, Long> {
     List<Competicao> findByModalidade(String modalidade);
 
-    List<Competicao> findMatchesByDataInicio(LocalDate date);
+    List<Competicao> findMatchesByDataInicioAndLocal(LocalDate date, String local);
 
+    /**
+     *
+     * @return Lista das competições
+     */
     @Query("SELECT c FROM Competicao c WHERE c.modalidade = :modalidade " +
             "AND c.local = :local " +
-            "AND c.dataInicio = :dataInicio AND c.dataTermino = :dataTermino " +
-            "AND c.horaTermino > :horaInicio " +
-            "AND c.horaInicio < :horaTermino")
-    List<Competicao> findTimeOverlap(@Param("modalidade") String modalidade,
-                                     @Param("local") String local,
-                                     @Param("dataInicio") LocalDate dataInicio,
-                                     @Param("dataTermino") LocalDate dataTermino,
-                                     @Param("horaInicio") LocalTime horaInicio,
-                                     @Param("horaTermino") LocalTime horaTermino);
+            "AND (c.dataInicio = :dataInicio OR c.dataTermino = :dataTermino)")
+    List<Competicao> findCompeticaoForTimeOverlapCheck(@Param("modalidade") String modalidade,
+                                                       @Param("local") String local,
+                                                       @Param("dataInicio") LocalDate dataInicio,
+                                                       @Param("dataTermino") LocalDate dataTermino);
 
     @Query("SELECT c FROM Competicao c WHERE c.modalidade = :modalidade " +
             "AND c.adversarioUm = :adversarioUm " +

@@ -5,12 +5,12 @@ import olimpiadastokyo.exceptions.EntityNotFoundException;
 import olimpiadastokyo.exceptions.RuleBrokenException;
 import olimpiadastokyo.exceptions.RuleErrorMessagesEnum;
 import olimpiadastokyo.repositories.CompeticaoRepository;
-import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by lnsr on 11/8/2017.
@@ -38,7 +38,7 @@ public class CompeticaoService {
         }
     }
 
-    public void create(Competicao c) throws RuleBrokenException {
+    public Competicao create(Competicao c) throws RuleBrokenException {
 
         if(!checkForTimeOverlap(c)) {
             throw new RuleBrokenException(Competicao.class, RuleErrorMessagesEnum.COD_0);
@@ -49,27 +49,27 @@ public class CompeticaoService {
         else if (!checkForMaxMatchesPerDay(c)) {
             throw new RuleBrokenException(Competicao.class, RuleErrorMessagesEnum.COD_2);
         }
-        else if (!c.getEtapa().equals(EtapasEnum.SEMIFINAL.getEtapaName()) &&
-                !c.getEtapa().equals(EtapasEnum.FINAL.getEtapaName())) {
-
-            if (!checkForDuplicatedMatches(c))
-                throw new RuleBrokenException(Competicao.class, RuleErrorMessagesEnum.COD_3);
+        else if (!checkForDuplicatedMatches(c)) {
+            throw new RuleBrokenException(Competicao.class, RuleErrorMessagesEnum.COD_3);
         }
 
-        competicaoRepository.save(c);
+        return competicaoRepository.save(c);
     }
 
     public boolean checkForMinMatchDuration(Competicao c) {
-        long duration = new Interval(c.getHoraInicio().toDateTimeToday(), c.getHoraTermino().toDateTimeToday()).
-                toDuration().getStandardMinutes();
+        long millisInicio = c.getDataInicio().toDateTime(c.getHoraInicio()).getMillis();
+        long millisTermino = c.getDataTermino().toDateTime(c.getHoraTermino()).getMillis();
+        long millisDiff = millisTermino - millisInicio;
+
+        int duration = Integer.parseInt(String.format("%d", TimeUnit.MILLISECONDS.toMinutes(millisDiff)));
         if (duration < 30)
             return false;
 
         return true;
     }
 
-    private boolean checkForMaxMatchesPerDay(Competicao c) {
-        List<Competicao> list = competicaoRepository.findMatchesByDataInicio(c.getDataInicio());
+    public boolean checkForMaxMatchesPerDay(Competicao c) {
+        List<Competicao> list = competicaoRepository.findMatchesByDataInicioAndLocal(c.getDataInicio(), c.getLocal());
         if (list.size() >= 4)
             return false;
 
@@ -77,20 +77,37 @@ public class CompeticaoService {
     }
 
     /**
-     * A busca por sobreprosição de horários cadastrados está levando em consideração que a competição
-     * inicia e termina no mesmo dia.
-     *
-     * @param c objeto Competicao a ser validado
+     * @param comp objeto Competicao a ser validado
      * @return Retorna 'false' caso a checagem encontre que a regra sendo validada será quebrada
      */
-    public boolean checkForTimeOverlap(Competicao c) {
-        List<Competicao> list = competicaoRepository.findTimeOverlap(c.getModalidade(), c.getLocal(),
-                c.getDataInicio(), c.getDataTermino(), c.getHoraInicio(), c.getHoraTermino());
-        return list.isEmpty();
+    public boolean checkForTimeOverlap(Competicao comp) {
+        List<Competicao> list = competicaoRepository.findCompeticaoForTimeOverlapCheck(comp.getModalidade(), comp.getLocal(),
+                comp.getDataInicio(), comp.getDataTermino());
+
+        /*
+        * Converte as datas para timestamp em milissegundos para tratar casos competições sendo comparadas
+        * não iniciam e terminam no mesmo dia.
+        * */
+        long compInicioTimestamp = comp.getDataInicio().toDateTime(comp.getHoraInicio()).getMillis();
+        long compTerminoTimestamp = comp.getDataTermino().toDateTime(comp.getHoraTermino()).getMillis();
+
+        for (Competicao item : list) {
+            long itemInicioTimestamp = item.getDataInicio().toDateTime(item.getHoraInicio()).getMillis();
+            long itemTerminoTimestamp = item.getDataTermino().toDateTime(item.getHoraTermino()).getMillis();
+
+            if (itemTerminoTimestamp > compInicioTimestamp && itemInicioTimestamp < compTerminoTimestamp)
+                return false;
+        }
+        return true;
     }
 
-    private boolean checkForDuplicatedMatches(Competicao c) {
-        List<Competicao> list = competicaoRepository.findDuplicatedMatches(c.getModalidade(), c.getAdversarioUm(), c.getAdversarioDois());
-        return list.isEmpty();
+    public boolean checkForDuplicatedMatches(Competicao c) {
+        if (!c.getEtapa().equals(EtapasEnum.SEMIFINAL.getEtapaName())
+                && !c.getEtapa().equals(EtapasEnum.FINAL.getEtapaName())) {
+            List<Competicao> list = competicaoRepository.findDuplicatedMatches(c.getModalidade(), c.getAdversarioUm(), c.getAdversarioDois());
+            return list.isEmpty();
+        } else {
+            return true;
+        }
     }
 }

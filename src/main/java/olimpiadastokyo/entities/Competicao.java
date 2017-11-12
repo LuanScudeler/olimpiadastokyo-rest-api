@@ -43,6 +43,10 @@ public class Competicao implements Comparable<Competicao> {
 
     @Override
     public int compareTo(Competicao o) {
+        /*
+        * Condicionais para a ordenação tratar corretamente casos em que as
+        * competições não iniciam e terminam no mesmo dia. E também considerar o horário de inicio
+        * */
         int firstCompare = getDataInicio().compareTo(o.getDataInicio());
         if (firstCompare == 0) {
             int secondCompare = getDataTermino().compareTo(o.getDataTermino());

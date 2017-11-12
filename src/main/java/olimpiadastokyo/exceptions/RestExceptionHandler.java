@@ -19,6 +19,8 @@ import javax.validation.ConstraintViolationException;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private static final String PROP_ETAPA = "etapa";
+
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         String error = "Malformed JSON request";
@@ -27,9 +29,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        String argument = ex.getBindingResult().getFieldError().getField();
-        String error = String.format("Value for argument '%s' no valid. List of valid values: %s", argument, EtapasEnum.getValues());
-        return buildResponseEntity(new RestApiError(HttpStatus.FORBIDDEN, error, ex));
+        String prop = ex.getBindingResult().getFieldError().getField();
+        Object objRejectedValue = ex.getBindingResult().getFieldError().getRejectedValue();
+        String rejectedValue = objRejectedValue == null ? null : objRejectedValue.toString();
+        String errorMessage = "";
+
+        if (rejectedValue == null || rejectedValue.isEmpty())
+            errorMessage = String.format("Value for property '%s' cannot be null or empty", prop);
+        else if (prop.equals(PROP_ETAPA)) {
+            errorMessage = String.format("Value for property '%s' not valid. List of valid values: %s", PROP_ETAPA, EtapasEnum.getValues());
+        }
+
+        return buildResponseEntity(new RestApiError(HttpStatus.BAD_REQUEST, errorMessage, ex));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

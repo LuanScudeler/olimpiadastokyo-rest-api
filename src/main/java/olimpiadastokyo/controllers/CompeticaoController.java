@@ -7,6 +7,7 @@ import olimpiadastokyo.services.CompeticaoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +37,7 @@ public class CompeticaoController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
-    public void create(@Valid @RequestBody Competicao competicao) throws RuleBrokenException {
-        competicaoService.create(competicao);
+    public ResponseEntity<?> create(@Valid @RequestBody Competicao competicao) throws RuleBrokenException {
+        return ResponseEntity.ok(competicaoService.create(competicao));
     }
 }
